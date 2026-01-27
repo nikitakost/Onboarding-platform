@@ -1,10 +1,15 @@
-# Node modules
-backend/node_modules/
-frontend/node_modules/
+# Dependencies
+**/node_modules
 
-# Env files
-backend/.env
-frontend/.env
+# Environment variables 
+**/.env
 
-# IDE configurations
+# Build outputs 
+**/dist
+**/build
+
+# IDE configuration
 .vscode/
+.idea/
+*.log
+.DS_Store
