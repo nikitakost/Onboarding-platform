@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
-import AuthContext from './authContext'; 
-
+import AuthContext from './authContext';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -30,10 +29,10 @@ export const AuthProvider = ({ children }) => {
       const { data } = await api.post('/auth/login', { email, password });
       localStorage.setItem('token', data.token);
       setUser(data.user);
-      toast.success('Welcome back!');
+      toast.success('Вітаємо в системі!');
       return true;
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Enter error during login');
+      toast.error(error.response?.data?.message || 'Помилка входу');
       return false;
     }
   };
@@ -41,7 +40,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    toast.success('You have logged out successfully');
+    toast.success('Ви вийшли з системи');
   };
 
   return (

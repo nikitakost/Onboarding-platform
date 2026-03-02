@@ -21,10 +21,10 @@ const LoginPage = () => {
       component="main" 
       maxWidth="xs"
       sx={{
-        height: '100vh',           
-        display: 'flex',           
-        alignItems: 'center',      
-        justifyContent: 'center',  
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
       }}
     >
       <Paper 
