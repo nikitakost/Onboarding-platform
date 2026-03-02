@@ -63,11 +63,36 @@ exports.login = async (req, res) => {
         id: user._id,
         name: user.name,
         role: user.role,
-        email: user.email
+        email: user.email,
+        vibeResult: user.vibeResult
       }
     });
 
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера при отриманні користувачів', error: error.message });
+  }
+};
+
+exports.updateVibeResult = async (req, res) => {
+  try {
+    const { result } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.user.userId, 
+      { vibeResult: result }, 
+      { new: true }
+    ).select('-password');
+    
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка при збереженні результату', error: error.message });
   }
 };

@@ -9,6 +9,7 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
+import PsychologyIcon from '@mui/icons-material/Psychology';
 
 const drawerWidth = 240;
 
@@ -21,6 +22,7 @@ const MainLayout = () => {
   const menuItems = [
     { text: 'Дашборд', icon: <DashboardIcon />, path: '/' },
     { text: 'Мої задачі', icon: <AssignmentIcon />, path: '/tasks' },
+    { text: 'Вайбтест', icon: <PsychologyIcon />, path: '/vibe-test' },
     { text: 'Профіль', icon: <PersonIcon />, path: '/profile' },
   ];
 
@@ -81,8 +83,8 @@ const MainLayout = () => {
 
       {/* Maine Zone */}
       <Box component="main" sx={{ flexGrow: 1, bgcolor: 'background.default', p: 3 }}>
-        <Toolbar /> {/* Відступ, щоб шапка не перекривала текст */}
-        <Outlet />  {/* ТУТ БУДУТЬ ВІДМАЛЬОВУВАТИСЯ СТОРІНКИ */}
+        <Toolbar /> 
+        <Outlet />  
       </Box>
     </Box>
   );
