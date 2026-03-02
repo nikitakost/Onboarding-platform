@@ -9,6 +9,7 @@ import MainLayout from './components/MainLayout';
 import DashboardPage from './pages/DashboardPage';
 import TasksPage from './pages/TasksPage';
 import ProfilePage from './pages/ProfilePage';
+import VibeTestPage from './pages/VibeTestPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -31,7 +32,6 @@ function App() {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           
-          {/* Усі захищені маршрути обгорнуті в MainLayout */}
           <Route 
             path="/" 
             element={
@@ -40,10 +40,10 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* Ці сторінки підставляться замість <Outlet /> всередині MainLayout */}
             <Route index element={<DashboardPage />} />
             <Route path="tasks" element={<TasksPage />} />
             <Route path="profile" element={<ProfilePage />} />
+            <Route path="vibe-test" element={<VibeTestPage />} />
           </Route>
         </Routes>
       </Router>

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login } = require('../controllers/authController');
+const { register, login, getAllUsers, updateVibeResult } = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../models/User')
 
@@ -20,5 +20,11 @@ router.get('/me', authMiddleware, async (req, res) => {
     res.status(500).json({ message: 'Помилка сервера' });
   }
 });
+
+// GET /api/auth/users
+router.get('/users', authMiddleware, getAllUsers);
+
+// PATCH /api/auth/vibe
+router.patch('/vibe', authMiddleware, updateVibeResult);
 
 module.exports = router;

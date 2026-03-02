@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema({
     type: String, 
     default: '',
   },
+  vibeResult: {    
+    type: String,
+    default: null
+  }
 }, { timestamps: true }); // createdAt/updatedAt
 
 module.exports = mongoose.model('User', userSchema);
