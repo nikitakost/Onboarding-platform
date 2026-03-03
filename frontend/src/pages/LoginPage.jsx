@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../context/authContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Container, Box, TextField, Button, Typography, Paper } from '@mui/material';
 
 const LoginPage = () => {
@@ -73,6 +73,14 @@ const LoginPage = () => {
           >
             Увійти
           </Button>
+          <Box textAlign="center" mt={2}>
+            <Typography variant="body2" color="text.secondary">
+              Ще немає акаунту?{' '}
+              <Link to="/register" style={{ color: '#1976d2', textDecoration: 'none', fontWeight: 'bold' }}>
+                Зареєструватися
+              </Link>
+            </Typography>
+          </Box>
         </Box>
       </Paper>
     </Container>

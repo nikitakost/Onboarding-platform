@@ -6,29 +6,36 @@ const jwt = require('jsonwebtoken');
 // Register
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, position } = req.body;
+    const { name, email, password, position, hrCode } = req.body;
  
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: 'There is already a user with this email' });
+      return res.status(400).json({ message: 'Користувач з таким email вже існує' });
     }
 
     // Heshing password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    // Secret logic of roles
+    let assignedRole = 'Employee'; 
+    if (hrCode === 'SUPER_HR_2026') { 
+      assignedRole = 'HR';
+    }
+
     const newUser = new User({
       name,
       email,
       password: hashedPassword,
-      role: role || 'Employee',
+      role: assignedRole,
       position
     });
+    
     await newUser.save();
 
-    res.status(201).json({ message: 'User created successfully!' });
+    res.status(201).json({ message: 'Користувача успішно створено!' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ message: 'Помилка сервера', error: error.message });
   }
 };
 
