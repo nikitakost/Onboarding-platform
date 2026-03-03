@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getAllUsers, updateVibeResult } = require('../controllers/authController');
+const { register, login, getAllUsers, updateVibeResult, updateProfile } = require('../controllers/authController');
 const authMiddleware = require('../middleware/authMiddleware');
 const User = require('../models/User')
 
@@ -26,5 +26,8 @@ router.get('/users', authMiddleware, getAllUsers);
 
 // PATCH /api/auth/vibe
 router.patch('/vibe', authMiddleware, updateVibeResult);
+
+// PATCH /api/auth/profile 
+router.patch('/profile', authMiddleware, updateProfile);
 
 module.exports = router;

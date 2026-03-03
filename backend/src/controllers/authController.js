@@ -96,3 +96,19 @@ exports.updateVibeResult = async (req, res) => {
     res.status(500).json({ message: 'Помилка при збереженні результату', error: error.message });
   }
 };
+
+exports.updateProfile = async (req, res) => {
+  try {
+    const { name, position } = req.body;
+    
+    const user = await User.findByIdAndUpdate(
+      req.user.userId,
+      { name, position },
+      { new: true } 
+    ).select('-password');
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка при оновленні профілю', error: error.message });
+  }
+};
