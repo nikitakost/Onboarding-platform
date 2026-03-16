@@ -119,3 +119,29 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: 'Помилка при оновленні профілю', error: error.message });
   }
 };
+
+
+// Change password
+exports.updatePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Користувача не знайдено' });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Неправильний поточний пароль' });
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Пароль успішно змінено!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Помилка сервера', error: error.message });
+  }
+};
