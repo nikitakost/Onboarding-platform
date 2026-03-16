@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react';
 import { 
   Typography, Box, Card, CardContent, Grid, Chip, CircularProgress, 
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  FormControl, InputLabel, Select, MenuItem 
+  FormControl, InputLabel, Select, MenuItem, InputAdornment 
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search'; 
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/authContext';
@@ -23,9 +24,11 @@ const TasksPage = () => {
   const [tasks, setTasks] = useState([]);
   const [users, setUsers] = useState([]); 
   const [loading, setLoading] = useState(true);
-
   const [open, setOpen] = useState(false);
   const [newTask, setNewTask] = useState({ title: '', description: '', dueDate: '', assignedTo: '' });
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [assigneeFilter, setAssigneeFilter] = useState('All');
 
   useEffect(() => {
     fetchTasks();
@@ -38,7 +41,7 @@ const TasksPage = () => {
     try {
       const { data } = await api.get('/tasks');
       setTasks(data);
-    } catch{
+    } catch {
       toast.error('Не вдалося завантажити задачі');
     } finally {
       setLoading(false);
@@ -50,18 +53,19 @@ const TasksPage = () => {
       const { data } = await api.get('/auth/users');
       setUsers(data);
     } catch (error) {
-      console.error('Помилка завантаження користувачів:', error);
+      console.error('Помилка завантаження користувачів', error);
     }
   };
 
-  const handleCreateTask = async () => {
+ const handleCreateTask = async () => {
     try {
-      const { data } = await api.post('/tasks', newTask);
-      setTasks([data, ...tasks]);
+      await api.post('/tasks', newTask); 
+      
+      fetchTasks();
       setOpen(false);
       setNewTask({ title: '', description: '', dueDate: '', assignedTo: '' });
-      toast.success('Задачу успішно створено!');
-    } catch  {
+      toast.success('Задачу успішно призначено!');
+    } catch {
       toast.error('Помилка при створенні задачі');
     }
   };
@@ -69,12 +73,25 @@ const TasksPage = () => {
   const handleStatusChange = async (taskId, newStatus) => {
     try {
       const { data } = await api.patch(`/tasks/${taskId}/status`, { status: newStatus });
-      setTasks(tasks.map(task => task._id === taskId ? data : task));
+      // Оновлюємо статус в локальному масиві, зберігаючи об'єкт assignedTo
+      setTasks(tasks.map(task => task._id === taskId ? { ...task, status: data.status } : task));
       toast.success('Статус успішно оновлено!');
     } catch {
       toast.error('Не вдалося оновити статус');
     }
   };
+
+  
+  const filteredTasks = tasks.filter(task => {
+    const matchesSearch = task.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          (task.description && task.description.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesStatus = statusFilter === 'All' || task.status === statusFilter;
+
+    const matchesAssignee = assigneeFilter === 'All' || (task.assignedTo && task.assignedTo._id === assigneeFilter);
+
+    return matchesSearch && matchesStatus && matchesAssignee;
+  });
 
   if (loading) {
     return <Box sx={{ display: 'flex', justifyContent: 'center', mt: 5 }}><CircularProgress /></Box>;
@@ -82,9 +99,9 @@ const TasksPage = () => {
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-          {user?.role === 'HR' ? 'Управління задачами' : 'Мій план онбординга'}
+          {user?.role === 'HR' ? 'Управління задачами' : 'Мій план онбордингу'}
         </Typography>
 
         {user?.role === 'HR' && (
@@ -94,13 +111,67 @@ const TasksPage = () => {
         )}
       </Box>
 
-      {tasks.length === 0 ? (
-        <Typography variant="body1" color="text.secondary">
-          У вас поки немає задач.
-        </Typography>
+      {/* ПАНЕЛЬ ФІЛЬТРІВ */}
+      <Card sx={{ mb: 4, p: 2, bgcolor: 'background.default', border: '1px solid', borderColor: 'divider', boxShadow: 'none' }}>
+        <Grid container spacing={2} alignItems="center">
+          {/* Пошук */}
+          <Grid item xs={12} md={user?.role === 'HR' ? 4 : 6}>
+            <TextField
+              fullWidth
+              size="small"
+              placeholder="Пошук задач..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              InputProps={{
+                startAdornment: <InputAdornment position="start"><SearchIcon /></InputAdornment>,
+              }}
+            />
+          </Grid>
+          <Grid item xs={12} md={user?.role === 'HR' ? 4 : 6}>
+            <FormControl fullWidth size="small">
+              <InputLabel>Статус</InputLabel>
+              <Select
+                value={statusFilter}
+                label="Статус"
+                onChange={(e) => setStatusFilter(e.target.value)}
+              >
+                <MenuItem value="All">Всі статуси</MenuItem>
+                <MenuItem value="To Do">До виконання (To Do)</MenuItem>
+                <MenuItem value="In Progress">В процесі (In Progress)</MenuItem>
+                <MenuItem value="Done">Виконано (Done)</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Фільтр ТІЛЬКИ ДЛЯ HR */}
+          {user?.role === 'HR' && (
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth size="small">
+                <InputLabel>Виконавець</InputLabel>
+                <Select
+                  value={assigneeFilter}
+                  label="Виконавець"
+                  onChange={(e) => setAssigneeFilter(e.target.value)}
+                >
+                  <MenuItem value="All">Всі виконавці</MenuItem>
+                  {users.filter(u => u.role === 'Employee').map(u => (
+                    <MenuItem key={u._id} value={u._id}>{u.name}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+          )}
+        </Grid>
+      </Card>
+      {filteredTasks.length === 0 ? (
+        <Box textAlign="center" py={5}>
+          <Typography variant="body1" color="text.secondary">
+            Задач не знайдено. Спробуйте змінити критерії пошуку.
+          </Typography>
+        </Box>
       ) : (
         <Grid container spacing={3}>
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <Grid item xs={12} md={6} lg={4} key={task._id}>
               <Card elevation={2} sx={{ height: '100%', display: 'flex', flexDirection: 'column', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 4 } }}>
                 <CardContent sx={{ flexGrow: 1 }}>
@@ -108,8 +179,8 @@ const TasksPage = () => {
                     <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>{task.title}</Typography>
                     <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
                   </Box>
-
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{task.description}</Typography>
+                  
                   {user?.role === 'HR' && task.assignedTo && (
                     <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold', mb: 1 }}>
                       👤 Виконавець: {task.assignedTo.name}
@@ -122,6 +193,7 @@ const TasksPage = () => {
                     </Typography>
                   )}
                 </CardContent>
+                
                 <Box sx={{ p: 2, pt: 0 }}>
                   {task.status !== 'Done' && user?.role !== 'HR' && (
                     <Button 
@@ -141,47 +213,22 @@ const TasksPage = () => {
         </Grid>
       )}
 
-      {/* Модальное окно */}
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Призначити нову задачу</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus margin="dense" label="Назва задачі" fullWidth
-            value={newTask.title} onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-          />
-          <TextField
-            margin="dense" label="Опис" fullWidth multiline rows={3}
-            value={newTask.description} onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-          />
-          <TextField
-            margin="dense" label="Дедлайн" type="date" fullWidth
-            InputLabelProps={{ shrink: true }}
-            value={newTask.dueDate} onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-            sx={{ mb: 2 }} 
-          />
-         
+          <TextField autoFocus margin="dense" label="Назва задачі" fullWidth value={newTask.title} onChange={(e) => setNewTask({ ...newTask, title: e.target.value })} />
+          <TextField margin="dense" label="Опис" fullWidth multiline rows={3} value={newTask.description} onChange={(e) => setNewTask({ ...newTask, description: e.target.value })} />
+          <TextField margin="dense" label="Дедлайн" type="date" fullWidth InputLabelProps={{ shrink: true }} value={newTask.dueDate} onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })} sx={{ mb: 2 }} />
           <FormControl fullWidth margin="dense">
-            <InputLabel id="assign-user-label">Кому призначити</InputLabel>
-            <Select
-              labelId="assign-user-label"
-              value={newTask.assignedTo}
-              label="Кому назначить"
-              onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}
-            >
-              {users.map((u) => (
-                <MenuItem key={u._id} value={u._id}>
-                  {u.name} ({u.role}) - {u.email}
-                </MenuItem>
-              ))}
+            <InputLabel>Кому призначити</InputLabel>
+            <Select value={newTask.assignedTo} label="Кому призначити" onChange={(e) => setNewTask({ ...newTask, assignedTo: e.target.value })}>
+              {users.map((u) => <MenuItem key={u._id} value={u._id}>{u.name} ({u.role})</MenuItem>)}
             </Select>
           </FormControl>
-
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button onClick={() => setOpen(false)} color="inherit">Відмінити</Button>
-          <Button onClick={handleCreateTask} variant="contained" disabled={!newTask.title || !newTask.assignedTo}>
-            Створити задачу
-          </Button>
+          <Button onClick={() => setOpen(false)} color="inherit">Скасувати</Button>
+          <Button onClick={handleCreateTask} variant="contained" disabled={!newTask.title || !newTask.assignedTo}>Створити</Button>
         </DialogActions>
       </Dialog>
     </Box>

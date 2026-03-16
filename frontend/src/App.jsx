@@ -11,6 +11,7 @@ import TasksPage from './pages/TasksPage';
 import ProfilePage from './pages/ProfilePage';
 import VibeTestPage from './pages/VibeTestPage';
 import RegisterPage from './pages/RegisterPage';
+import WelcomeLetterPage from './pages/WelcomeLetterPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -43,6 +44,7 @@ function App() {
             }
           >
             <Route index element={<DashboardPage />} />
+            <Route path="welcome" element={<WelcomeLetterPage />} />
             <Route path="tasks" element={<TasksPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="vibe-test" element={<VibeTestPage />} />
