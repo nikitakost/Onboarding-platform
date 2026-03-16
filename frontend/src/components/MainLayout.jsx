@@ -10,6 +10,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import WavingHandIcon from '@mui/icons-material/WavingHand';
 
 const drawerWidth = 240;
 
@@ -21,6 +22,7 @@ const MainLayout = () => {
 
   const menuItems = [
     { text: 'Дашборд', icon: <DashboardIcon />, path: '/' },
+    { text: 'Welcome Letter', icon: <WavingHandIcon />, path: '/welcome' },
     { text: 'Мої задачі', icon: <AssignmentIcon />, path: '/tasks' },
     { text: 'Вайбтест', icon: <PsychologyIcon />, path: '/vibe-test' },
     { text: 'Профіль', icon: <PersonIcon />, path: '/profile' },
