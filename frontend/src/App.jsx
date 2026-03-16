@@ -3,6 +3,7 @@ import { Toaster } from 'react-hot-toast';
 import { CssBaseline } from '@mui/material';
 import { AuthProvider } from './context/AuthProvider';
 import { useAuth } from './context/authContext';
+import { CustomThemeProvider } from './context/ThemeContext';
 
 import LoginPage from './pages/LoginPage';
 import MainLayout from './components/MainLayout';
@@ -27,6 +28,7 @@ const ProtectedRoute = ({ children }) => {
 
 function App() {
   return (
+    <CustomThemeProvider>
     <AuthProvider>
       <CssBaseline />
       <Router>
@@ -52,6 +54,7 @@ function App() {
         </Routes>
       </Router>
     </AuthProvider>
+    </CustomThemeProvider>
   );
 }
 
