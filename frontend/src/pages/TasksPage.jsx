@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { 
   Typography, Box, Card, CardContent, Grid, Chip, CircularProgress, 
   Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  FormControl, InputLabel, Select, MenuItem, InputAdornment 
+  FormControl, InputLabel, Select, MenuItem, InputAdornment, IconButton
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import SearchIcon from '@mui/icons-material/Search'; 
+import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../context/authContext';
@@ -78,6 +79,20 @@ const TasksPage = () => {
       toast.success('Статус успішно оновлено!');
     } catch {
       toast.error('Не вдалося оновити статус');
+    }
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    if (!window.confirm('Ви впевнені, що хочете назавжди видалити цю задачу?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/tasks/${taskId}`);
+      setTasks(tasks.filter(task => task._id !== taskId));
+      toast.success('Задачу успішно видалено!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Не вдалося видалити задачу');
     }
   };
 
@@ -177,7 +192,19 @@ const TasksPage = () => {
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                     <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>{task.title}</Typography>
-                    <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
+                      {user?.role === 'HR' && (
+                        <IconButton 
+                          size="small" 
+                          color="error" 
+                          onClick={() => handleDeleteTask(task._id)}
+                          title="Видалити задачу"
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      )}
+                    </Box>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{task.description}</Typography>
                   
