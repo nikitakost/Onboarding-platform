@@ -5,8 +5,6 @@ import {
 } from '@mui/material';
 import api from '../services/api';
 import { useAuth } from '../context/authContext';
-
-// Іконки
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PeopleIcon from '@mui/icons-material/People';
@@ -15,8 +13,6 @@ import PendingActionsIcon from '@mui/icons-material/PendingActions';
 const DashboardPage = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState([]);
-  
-  // Змінили: тепер зберігаємо не просто кількість, а ВЕСЬ масив співробітників
   const [employees, setEmployees] = useState([]); 
   const [loading, setLoading] = useState(true);
 
@@ -51,10 +47,7 @@ const DashboardPage = () => {
   const doneTasks = tasks.filter(t => t.status === 'Done').length;
   const pendingTasks = totalTasks - doneTasks;
   const progressPercentage = totalTasks === 0 ? 0 : Math.round((doneTasks / totalTasks) * 100);
-
-  // 👇 НОВА ЛОГІКА: Рахуємо статистику по КОЖНОМУ співробітнику окремо
   const employeeStats = employees.map(emp => {
-    // Шукаємо всі задачі, які призначені саме цій людині
     const empTasks = tasks.filter(t => t.assignedTo && t.assignedTo._id === emp._id);
     const total = empTasks.length;
     const done = empTasks.filter(t => t.status === 'Done').length;
@@ -63,7 +56,6 @@ const DashboardPage = () => {
     return { ...emp, totalTasks: total, doneTasks: done, progress };
   });
 
-  // Компонент-картка для метрики
   const StatCard = ({ title, value, icon, color }) => (
     <Card elevation={2} sx={{ height: '100%', display: 'flex', alignItems: 'center', p: 2 }}>
       <Box sx={{ bgcolor: `${color}.light`, color: `${color}.dark`, p: 2, borderRadius: 2, display: 'flex', mr: 2 }}>
@@ -128,8 +120,6 @@ const DashboardPage = () => {
           </Box>
         </Box>
       </Paper>
-
-      {/* 👇 НОВИЙ БЛОК: Детальна статистика по співробітниках (ТІЛЬКИ ДЛЯ HR) */}
       {user?.role === 'HR' && (
         <Box mt={2}>
           <Typography variant="h5" mb={3} fontWeight="bold">

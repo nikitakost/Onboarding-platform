@@ -74,7 +74,6 @@ const TasksPage = () => {
   const handleStatusChange = async (taskId, newStatus) => {
     try {
       const { data } = await api.patch(`/tasks/${taskId}/status`, { status: newStatus });
-      // Оновлюємо статус в локальному масиві, зберігаючи об'єкт assignedTo
       setTasks(tasks.map(task => task._id === taskId ? { ...task, status: data.status } : task));
       toast.success('Статус успішно оновлено!');
     } catch {
