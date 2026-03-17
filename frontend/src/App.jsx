@@ -13,11 +13,11 @@ import ProfilePage from './pages/ProfilePage';
 import VibeTestPage from './pages/VibeTestPage';
 import RegisterPage from './pages/RegisterPage';
 import WelcomeLetterPage from './pages/WelcomeLetterPage';
+import DocumentsPage from './pages/DocumentsPage';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   
-  // Поки йде перевірка токена - показуємо нічого (або спінер)
   if (loading) return null; 
 
   if (!user) {
@@ -50,6 +50,7 @@ function App() {
             <Route path="tasks" element={<TasksPage />} />
             <Route path="profile" element={<ProfilePage />} />
             <Route path="vibe-test" element={<VibeTestPage />} />
+            <Route path="documents" element={<DocumentsPage />} />
           </Route>
         </Routes>
       </Router>

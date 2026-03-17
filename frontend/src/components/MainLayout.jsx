@@ -14,8 +14,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import WavingHandIcon from '@mui/icons-material/WavingHand';
 import SettingsIcon from '@mui/icons-material/Settings';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import LanguageIcon from '@mui/icons-material/Language';
+import FolderIcon from '@mui/icons-material/Folder';
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 
@@ -69,6 +69,7 @@ const MainLayout = () => {
     { text: 'Мої задачі', icon: <AssignmentIcon />, path: '/tasks' },
     { text: 'Вайбтест', icon: <PsychologyIcon />, path: '/vibe-test' },
     { text: 'Профіль', icon: <PersonIcon />, path: '/profile' },
+    { text: 'Документи', icon: <FolderIcon />, path: '/documents' },
   ];
 
   return (
