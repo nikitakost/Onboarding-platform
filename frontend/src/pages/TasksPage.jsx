@@ -151,7 +151,6 @@ const TasksPage = () => {
               >
                 <MenuItem value="All">Всі статуси</MenuItem>
                 <MenuItem value="To Do">До виконання (To Do)</MenuItem>
-                <MenuItem value="In Progress">В процесі (In Progress)</MenuItem>
                 <MenuItem value="Done">Виконано (Done)</MenuItem>
               </Select>
             </FormControl>

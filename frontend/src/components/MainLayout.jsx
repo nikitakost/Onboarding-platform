@@ -4,7 +4,7 @@ import {
   Box, Drawer, AppBar, Toolbar, List, Typography, Divider, 
   ListItem, ListItemButton, ListItemIcon, ListItemText, IconButton, 
   Button, Switch, Dialog, DialogTitle, DialogContent, DialogActions,
-  TextField, CircularProgress
+  TextField, CircularProgress, Avatar, ListItemAvatar 
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssignmentIcon from '@mui/icons-material/Assignment';
@@ -16,6 +16,10 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LanguageIcon from '@mui/icons-material/Language';
 import FolderIcon from '@mui/icons-material/Folder';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline'; 
+import EmailIcon from '@mui/icons-material/Email';
+import TelegramIcon from '@mui/icons-material/Telegram';
+
 import api from '../services/api';
 import { toast } from 'react-hot-toast';
 
@@ -30,6 +34,7 @@ const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [contactsOpen, setContactsOpen] = useState(false); 
   const [passOpen, setPassOpen] = useState(false);
   const [passData, setPassData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
   const [isChangingPass, setIsChangingPass] = useState(false);
@@ -75,18 +80,34 @@ const MainLayout = () => {
   return (
     <Box sx={{ display: 'flex' }}>
       {/* ВЕРХНЯ ШАПКА */}
-      <AppBar position="fixed" sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px` }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-          <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
-            Привіт, {user?.name}
+      <AppBar position="fixed" sx={{ width: `calc(100% - ${drawerWidth}px)`, ml: `${drawerWidth}px`, boxShadow: 1 }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          
+          {/* 👈 ЛІВА ЧАСТИНА (Логотип) */}
+          <Typography 
+            variant="h6" 
+            sx={{ fontWeight: '900', letterSpacing: 1, userSelect: 'none' }}
+          >
+            Onboarding<Box component="span" sx={{ color: 'warning.main' }}>+</Box>
           </Typography>
-          <IconButton color="inherit" onClick={() => setSettingsOpen(true)}>
-            <SettingsIcon />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 2 }}>
+              Привіт, {user?.name}
+            </Typography>
+            
+            <IconButton color="inherit" onClick={() => setContactsOpen(true)} title="Допомога та Контакти">
+              <HelpOutlineIcon />
+            </IconButton>
 
-          <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
-            Вийти
-          </Button>
+            <IconButton color="inherit" onClick={() => setSettingsOpen(true)} title="Налаштування">
+              <SettingsIcon />
+            </IconButton>
+
+            <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />} sx={{ ml: 1 }}>
+              Вийти
+            </Button>
+          </Box>
+          
         </Toolbar>
       </AppBar>
 
@@ -135,6 +156,82 @@ const MainLayout = () => {
             );
           })}
         </List>
+        <Box sx={{ mt: 'auto', p: 2, pb: 3, textAlign: 'center' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ opacity: 0.6 }}>
+            © 2026 HR Platform v1.0 <br /> by Nikita Kostenko
+          </Typography>
+        </Box>
+
+      </Drawer>
+
+      {/* ПРАВА ПАНЕЛЬ КОНТАКТІВ */}
+      <Drawer anchor="right" open={contactsOpen} onClose={() => setContactsOpen(false)}>
+        <Box sx={{ width: 340, p: 3 }}>
+          <Typography variant="h6" fontWeight="bold" mb={1}>
+            Потрібна допомога?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" mb={3}>
+            Звертайтеся до наших спеціалістів, якщо у вас виникли питання.
+          </Typography>
+
+          <List sx={{ bgcolor: 'background.default', borderRadius: 2, p: 1 }}>
+            <ListItem alignItems="flex-start" sx={{ mb: 1, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
+              <ListItemAvatar>
+                <Avatar sx={{ bgcolor: 'primary.main' }}>HR</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={<Typography fontWeight="bold">Відділ кадрів (HR)</Typography>}
+                secondary={
+                  <Box mt={0.5}>
+                    <Typography variant="body2" display="flex" alignItems="center" gap={1} mb={0.5}>
+                      <EmailIcon fontSize="small" color="action" /> hr@company.com
+                    </Typography>
+                    <Typography variant="body2" display="flex" alignItems="center" gap={1}>
+                      <TelegramIcon fontSize="small" color="action" /> @hr_support
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            <ListItem alignItems="flex-start" sx={{ mb: 1, bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
+              <ListItemAvatar>
+                <Avatar sx={{ bgcolor: 'secondary.main' }}>IT</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={<Typography fontWeight="bold">IT Підтримка</Typography>}
+                secondary={
+                  <Box mt={0.5}>
+                    <Typography variant="body2" display="flex" alignItems="center" gap={1} mb={0.5}>
+                      <EmailIcon fontSize="small" color="action" /> it@company.com
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      (Налаштування, техніка, баги)
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+            <ListItem alignItems="flex-start" sx={{ bgcolor: 'background.paper', borderRadius: 1, boxShadow: 1 }}>
+              <ListItemAvatar>
+                <Avatar sx={{ bgcolor: 'success.main' }}>$</Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={<Typography fontWeight="bold">Бухгалтерія</Typography>}
+                secondary={
+                  <Box mt={0.5}>
+                    <Typography variant="body2" display="flex" alignItems="center" gap={1}>
+                      <EmailIcon fontSize="small" color="action" /> finance@company.com
+                    </Typography>
+                  </Box>
+                }
+              />
+            </ListItem>
+          </List>
+          
+          <Button variant="outlined" fullWidth sx={{ mt: 3 }} onClick={() => setContactsOpen(false)}>
+            Закрити
+          </Button>
+        </Box>
       </Drawer>
 
       {/* ПРАВА ПАНЕЛЬ НАЛАШТУВАНЬ */}
